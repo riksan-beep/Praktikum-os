@@ -1,0 +1,13 @@
+mkdir -p marketing/{documents,archives} engineering/{documents,archives} hr/{documents,archives}
+tree
+touch report1.pdf
+cp report1.pdf marketing/documents
+tree -I 'report1.pdf' marketing/documents
+cp marketing/documents/report1.pdf marketing/archives
+tree
+sudo groupadd marketing
+sudo chown -R :marketing marketing
+sudo chmod -R 776 marketing
+find / -type f -name "*.pdf" -o -name "*.exe"
+find / -type f -name "*.pdf" -o -name "*.exe" > test.txt
+find / -type f -name "*.pdf" -o -name "*.exe" -print > test.txt
