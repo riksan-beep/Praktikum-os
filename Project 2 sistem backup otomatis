@@ -1,0 +1,105 @@
+mkdir backup
+ls
+nano backup.sh
+#!/bin/bash
+# Script: backup.sh
+# Tujuan: Membuat sistem backup otomatis untuk folder "backup" ke "save_backup".
+
+#
+# ==============================
+# # KONFIGURASI SPESIFIK
+# #
+# ==============================
+
+# 1. Direktori Sumber (Folder yang akan di-backup)
+# Asumsi folder "backup" berada di Desktop user saat ini
+SOURCE_DIR="$HOME/Desktop/backup"
+
+# 2. Direktori Tujuan (Tempat file backup akan disimpan)
+# Asumsi folder "save_backup" berada di Desktop user saat ini
+BACKUP_DIR="$HOME/Desktop/save_backup"
+
+# 3. File Log (Pindah ke folder user untuk menghindari 'Permission Denied')
+LOG_FILE="$HOME/backup_logs/backup_server.log"
+
+#
+# ==============================
+# # VARIABEL SISTEM
+# #
+# ==============================
+
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+ARCHIVE_NAME="project_backup_$TIMESTAMP.tar.gz"
+
+#
+# ==============================
+# # FUNGSI DAN EKSEKUSI UTAMA
+# #
+# ==============================
+
+# Fungsi untuk mencatat aktivitas
+log_activity() {
+    echo "[${TIMESTAMP}] $1" >> $LOG_FILE
+}
+
+# Fungsi untuk notifikasi
+send_notification() {
+    log_activity "INFO: Sistem notifikasi: $1"
+    echo "Pesan: $1" # Notifikasi di terminal
+}
+
+# Membuat direktori log jika belum ada
+mkdir -p $(dirname "$LOG_FILE")
+
+# Memulai proses
+log_activity "--- Proses Backup Dimulai ---"
+
+# 1. Cek Direktori Sumber dan Tujuan
+
+# Cek Direktori Sumber
+if [ ! -d "$SOURCE_DIR" ]; then
+    send_notification "ERROR: Direktori sumber ($SOURCE_DIR) tidak ditemukan. Pastikan folder 'backup' ada di Desktop."
+    log_activity "--- Proses Backup GAGAL ---"
+    exit 1
+fi
+
+# Membuat direktori tujuan jika belum ada
+mkdir -p "$BACKUP_DIR"
+if [ ! -d "$BACKUP_DIR" ]; then
+    send_notification "ERROR: Gagal membuat/mengakses direktori tujuan ($BACKUP_DIR)."
+    log_activity "--- Proses Backup GAGAL ---"
+    exit 1
+fi
+
+# 2. Kompresi File (tar.gz)
+log_activity "Mengkompresi '$SOURCE_DIR' ke '$ARCHIVE_NAME'..."
+
+# Catatan: -C "$SOURCE_DIR" memungkinkan kita mengarsipkan isi folder 'backup'
+tar -czf "$ARCHIVE_NAME" -C "$(dirname "$SOURCE_DIR")" "$(basename "$SOURCE_DIR")"
+
+ARCHIVE_STATUS=$?
+
+if [ $ARCHIVE_STATUS -ne 0 ]; then
+    send_notification "ERROR: Kompresi gagal. Status: $ARCHIVE_STATUS"
+    log_activity "--- Proses Backup GAGAL ---"
+    exit 1
+fi
+
+# 3. Pemindahan File Backup (dengan Timestamp)
+log_activity "Memindahkan file ke direktori tujuan ($BACKUP_DIR)..."
+
+mv "$ARCHIVE_NAME" "$BACKUP_DIR/"
+MOVE_STATUS=$?
+
+if [ $MOVE_STATUS -ne 0 ]; then
+    send_notification "ERROR: Pemindahan file gagal. Status: $MOVE_STATUS"
+    log_activity "--- Proses Backup GAGAL ---"
+    exit 1
+fi
+
+# 4. Selesai dan Notifikasi Sukses
+send_notification "SUCCESS: Backup Berhasil Disimpan di $BACKUP_DIR/$ARCHIVE_NAME"
+log_activity "--- Proses Backup Selesai ---"
+exit 0
+chmod +x backup.sh
+./backup.sh
