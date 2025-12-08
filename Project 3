@@ -1,0 +1,20 @@
+@echo off
+title BACKUP AUTOMATION
+
+REM Membuat folder tujuan jika belum ada
+if not exist "C:\Users\vboxuser\Project_3\Backup" (
+mkdir "C:\Users\vboxuser\Project_3\Backup"
+)
+
+echo =====================================
+echo MEMULAI PROSES BACKUP
+echo =====================================
+
+REM Menyalin semua file dan folder dari Project_1\MyFiles ke Backup
+xcopy "C:\Users\vboxuser\Project_1\MyFiles\*.docs" "C:\Users\vboxuser\Project_3\Backup\" /s /i /y
+
+echo =====================================
+echo BACKUP SELESAI
+echo File Tersimpan di C:\Users\vboxuser\Project_3\Backup
+echo =====================================
+pause
