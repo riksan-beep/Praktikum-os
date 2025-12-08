@@ -1,0 +1,87 @@
+@echo off
+setlocal enabledelayedexpansion
+title RECOVERY EXPERT MODE
+color 9B
+
+REM ======================================================
+REM             KONFIGURASI JARINGAN & JALUR
+REM ======================================================
+SET SourceDir=D:\apa nama folder sumber\
+SET DestinationRoot=C:\apa nama folder tujuan\
+
+REM --- KONFIGURASI EMAIL (WAJIB DISESUAIKAN) ---
+SET EmailTo=acehikenno072@gmail.com
+SET EmailFrom=pubgmobilee466@gmail.com
+SET SMTPServer=smtp.gmail.com
+SET SMTPPort=587 
+SET EmailSubject=LAPORAN BACKUP OTOMATIS
+
+REM ======================================================
+REM KRITERIA 1: SELECTIVE BACKUP (Pilihan User)
+REM ======================================================
+:MENU
+cls
+echo ======================================================
+echo PILIH FOLDER UNTUK BACKUP (SELECTIVE BACKUP)
+echo ======================================================
+echo [1] Folder_1 SAJA
+echo [2] Folder_2 SAJA
+echo [3] SEMUA FOLDER (FULL BACKUP)
+echo [4] EXIT
+echo.
+SET /P Pilih=Masukkan pilihan (1-4): 
+
+IF "%Pilih%"=="1" SET FolderToBackup=\Folder_1 & GOTO EXECUTE
+IF "%Pilih%"=="2" SET FolderToBackup=\Folder_2 & GOTO EXECUTE
+IF "%Pilih%"=="3" SET FolderToBackup=\ & GOTO EXECUTE_ALL
+IF "%Pilih%"=="4" GOTO END
+GOTO MENU
+
+REM ======================================================
+REM KRITERIA 2: INCREMENTAL BACKUP (Robocopy)
+REM ======================================================
+:EXECUTE
+SET BackupName=%date:~-4,4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%_PARTIAL
+SET SourcePath=%SourceDir%%FolderToBackup%
+GOTO START_COPY
+
+:EXECUTE_ALL
+SET BackupName=%date:~-4,4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%_FULL
+SET SourcePath=%SourceDir%
+GOTO START_COPY
+
+:START_COPY
+SET TargetDir=%DestinationRoot%\DataRecovery_%BackupName%
+SET LogFile=%TargetDir%\recovery_expert_log.txt
+
+mkdir "%DestinationRoot%"
+mkdir "%TargetDir%"
+
+echo.
+echo Memulai backup incremental Robocopy dari %SourcePath%...
+REM Robocopy secara default incremental (hanya menyalin file yang baru/berubah).
+REM /Z, /MT:8, /E adalah fitur Expert. /XO memastikan file lama di sumber tidak ditimpa.
+robocopy "%SourcePath%" "%TargetDir%" /E /Z /MT:8 /XO /LOG:"%LogFile%"
+
+echo.
+echo ✅ BACKUP SELESAI. Cek log untuk detail incremental.
+echo.
+
+REM ======================================================
+REM KRITERIA 4: EMAIL NOTIFICATION
+REM ======================================================
+echo Mengirim Notifikasi Email...
+
+SET MessageBody=Backup ke %TargetDir% selesai pada %date% %time%. Cek log file: %LogFile%
+
+PowerShell -Command "& { \
+    Send-MailMessage -To '%EmailTo%' -From '%EmailFrom%' -Subject '%EmailSubject%' -Body '%MessageBody%' -SmtpServer '%SMTPServer%' -Port %SMTPPort% -UseSsl -Credential (Get-Credential) \
+}"
+
+echo.
+echo ✅ Notifikasi Email telah dikirim (memerlukan konfigurasi SMTP yang valid).
+
+:END
+pause
+endlocal
+exit
