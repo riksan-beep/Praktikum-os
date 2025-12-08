@@ -1,0 +1,30 @@
+mkdir Project_1
+cd Project_1
+mkdir MyFiles
+cd MyFiles
+
+mkdir Documents Pictures Music Videos Kuliah
+cd Kuliah
+mkdir Sistem_operasi Agama Pancasila Logika_matematika PTSI
+cd ..
+
+echo. > Resume_agama.pdf
+echo. > Video_random.mp4
+echo. > multo.mp3
+echo. > File_makalah.docx
+echo. > Project_SO.docx
+echo. > Video_ptsi.mp4
+echo. > Gambar_random.jpg
+echo. > UAS_logika.docx
+echo. > Tugas_pancasila.pdf
+
+move Resume_agama.pdf Kuliah\Agama
+move Video_random.mp4 Videos
+move Tujuhbelas_by_tulus.mp3 Music
+move File_makalah.docx Documents
+move Project_sistemoperasi.docx Kuliah\Sistem_operasi
+move Video_ptsi.mp4 Kuliah\PTSI
+move Gambar_ain.jpg Pictures
+move UAS_logikamatekika.docx Kuliah\Logika_matematika
+move Tugas_pancasila.pdf Kuliah\Pancasila
+tree
