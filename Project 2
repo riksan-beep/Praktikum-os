@@ -1,0 +1,29 @@
+echo ======================================
+echo NETWORK DIAGNOSTIC TOOL
+echo ======================================
+echo.
+
+echo Mengecek konfigurasi IP...
+ipconfig /all > hasil_ipconfig.txt
+echo Hasil tersimpan di hasil_ipconfig.txt
+echo.
+
+echo Test koneksi internet ke DNS Google...
+ping 8.8.8.8 > hasil_ping_dns.txt
+echo Hasil tersimpan di hasil_ping_dns.txt
+echo.
+
+echo Test koneksi ke website Google...
+ping google.com > hasil_ping_google.txt
+echo Hasil tersimpan di hasil_ping_google.txt
+echo.
+
+echo Trace route ke Google...
+tracert google.com > hasil_traceroute.txt
+echo Hasil tersimpan di hasil_traceroute.txt
+echo.
+
+echo Melihat Koneksi Aktif...
+netstat -an > hasil_netstat.txt
+echo Hasil tersimpan di hasil_netstat.txt
+echo.
