@@ -1,0 +1,41 @@
+@echo off
+title SYSTEM HEALTH CHECK
+
+REM Membuat folder laporan jika belum ada
+if not exist "C:\Users\vboxuser\Project_4\System_health" (
+mkdir "C:\Users\vboxuser\Project_4\System_health"
+)
+
+echo =====================================
+echo MEMULAI SYSTEM HEALTH CHECK
+echo =====================================
+echo.
+
+REM 1. Informasi Sistem
+echo Mengambil Informasi Sistem...
+systeminfo > C:\Users\vboxuser\Project_4\System_health\health_report.txt
+
+REM 2. Cek Disk
+echo Menjalankan Cek Disk...
+echo. >> C:\Users\vboxuser\Project_4\System_health\health_report.txt
+echo ==== CEK DISK ==== >> C:\Users\vboxuser\System_health\health_report.txt
+chdkdsk C: >> C:\Users\vboxuser\Project_4\System_health\health_report.txt
+
+REM 3. Monitor Proses
+echo Memonitor Proses Aktif...
+echo. >> C:\Users\vboxuser\Project_4\System_health\health_report.txt
+echo ==== DAFTAR PROSES ===== >> C:\Users\vboxuser\Project_4\System_health\health_report.txt
+tasklist >> C:\Users\vboxuser\Project_4\System_health\health_report.txt
+
+REM 4. Analisis Resource
+echo Analisis Proses Penggunaan Memori Tinggi...
+echo. >> C:\Users\vboxuser\Project_4\System_health\health_report.txt
+echo ==== PROSES DI ATAS 50 MB ==== >> C:\Users\vboxuser\Project_4\System_health\health_report.txt
+tasklist /FI "MEMUSAGE gt 50000" >> C:\Users\vboxuser\Project_4\System_health\health_report.txt
+
+REM 5. Selesai
+echo =======================================
+echo HEALTH CHECK SELESAI
+echo Laporan Tersimpan di: C:\Users\vboxuser\Project_4\System_health\health_report.txt
+echo =======================================
+pause
